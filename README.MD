@@ -33,10 +33,10 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 
 ## 🏗️ Architecture
 
-```
+```mermaid
 flowchart LR
 
-    subgraph Frontend["Frontend"]
+    subgraph Frontend["Frontend (Vercel)"]
         R[React App]
         FA[Firebase Auth]
         FS[Firebase Storage]
@@ -45,12 +45,12 @@ flowchart LR
         R --> FS
     end
 
-    subgraph Backend["Backend"]
+    subgraph Backend["Backend (Railway)"]
         E[Express Server]
-        U[/api/users/]
-        S[/api/songs/]
-        AR[/api/artist/]
-        AL[/api/albums/]
+        U["/api/users/"]
+        S["/api/songs/"]
+        AR["/api/artist/"]
+        AL["/api/albums/"]
 
         E --> U
         E --> S
@@ -64,7 +64,6 @@ flowchart LR
 
     Frontend <-->|HTTP API| Backend
     Backend <-->|MongoDB Driver| Database
-**Auth flow:** User signs in with Google → Firebase issues JWT token → React sends token as `Authorization: Bearer` header → Express verifies token via Firebase Admin SDK → user data stored/updated in MongoDB.
 ```
 
 ## 🚀 Local Development
