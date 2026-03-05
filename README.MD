@@ -1,131 +1,169 @@
-<div align="center">
-    <h1><strong>Musicflew<strong></strong></h1>
-</div>
+# 🎵 Musicflew
 
-<p>
-Fullstack application based on React and Node.js that creates artists, plays and creates songs and albums. 
-By <b>default</b>, new User is set to be a <b>"Member"</b> after successfully logging into a Gmail account. Admin has the option to change the role of new User to "Admin" after a status change request has been made. When the new role is set User has the same management tools as Admin.
+A full-stack music streaming web application built with React, Node.js, MongoDB, and Firebase Authentication.
 
-<b>Admin can change the roles of other Admins and Members</b> and can <b>remove</b> them from the database completely although after being accidentally deleted, they can be restored to their roles easily by successfully logging into the Gmail account again.
+> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) · **Backend:** [Railway](https://railway.app)
 
-Click on Song's when You want to search or filter songs. Click Plus button to create a new song or an Artist or Album by uploading audio and images.
-Click on Contact to contact me. Feel free to ask !
+---
 
-<h4>Please read the instructions below to configure and install the App before download the repository</h4>
+## ✨ Features
 
-<b>If some problem occurs please feel free to contact me. </b>
-Please be aware that the Musicflew is still being improved and waiting for deployment. New functionalites will be added in the future
+- **Google Sign-In** via Firebase Authentication
+- **Role-based access control** — Member / Admin roles
+- **Admin dashboard** — manage songs, artists, albums, and users
+- **Music player** — play songs with full controls (react-h5-audio-player)
+- **File uploads** — audio and images stored in Firebase Storage
+- **CRUD operations** — create, edit, delete songs / artists / albums
+- **Filtering** — filter songs by language, artist, album, category
+- **Animated UI** — smooth transitions with Framer Motion
 
-<h3>Enjoy the fun !</h3>
-<br>
+---
 
-<hr>
+## 🛠️ Tech Stack
 
-![pic](./client/public/screen1.png "main logo")
+| Layer    | Technology                                             |
+| -------- | ------------------------------------------------------ |
+| Frontend | React 18, React Router v6, Tailwind CSS, Framer Motion |
+| Backend  | Node.js, Express                                       |
+| Database | MongoDB Atlas (Mongoose)                               |
+| Auth     | Firebase Authentication (Google Sign-In)               |
+| Storage  | Firebase Storage                                       |
+| Hosting  | Vercel (frontend) + Railway (backend)                  |
 
-<p>
+---
 
-<br>
-<hr<>
+## 🏗️ Architecture
 
-<div align="center">
-<h1>Dependencies and installation</h1>
-    <h4><strong>React and Node.js<strong></strong></h4>
-</div>
-
-### 1. Before using the app please follow commands:
-
-Type this code below in the bash console to clone repository in the desired place in your computer
-
-```bash
-    git clone https://gitlab.com/shopa.tomek/musicflew.git
+```
+┌─────────────────┐        ┌────────────────────┐        ┌──────────────┐
+│  React (Vercel) │◄──────►│ Express (Railway)  │◄──────►│ MongoDB Atlas│
+│                 │        │   REST API         │        └──────────────┘
+│  Firebase Auth  │        │   /api/users       │
+│  Firebase Store │        │   /api/songs       │
+└─────────────────┘        │   /api/artist      │
+                           │   /api/albums      │
+                           └────────────────────┘
 ```
 
-Due to app is based on both React and Node.js it's essential to install all necessary depenencies
-for the client and server folder separately
+**Auth flow:** User signs in with Google → Firebase issues JWT token → Frontend sends token as `Authorization: Bearer` header → Backend verifies token via Firebase Admin SDK → MongoDB stores user data.
 
-### 2. Go to the cloned **musicflew** project folder and then:
+---
 
-### For React:
+## 🚀 Getting Started
 
-```bash
-    cd client
-```
+### Prerequisites
 
-and now install all dependencies
+- Node.js 16+
+- MongoDB Atlas account
+- Firebase project (Auth + Storage enabled)
 
-```bash
-    npm install
-```
-
-### For Node
+### 1. Clone the repository
 
 ```bash
-    cd server
+git clone https://github.com/your-username/musicflew.git
+cd musicflew
 ```
 
-and now install all dependencies
+### 2. Configure environment variables
 
 ```bash
-    npm install
+# Client
+cp .env.example client/.env
+
+# Server
+cp .env.example server/.env
 ```
 
-<hr>
-<div align="center">
-    <h1><strong>Start the app:<strong></strong></h1>
-</div>
-<hr>
+Edit both `.env` files with your credentials (see `.env.example` for all required keys).
 
-<p>After installation of the all necessary dependencies (like node modules) is done, You can run app typing: <p>
-
-### REACT SERVER
-
-<hr>
-<hr>
-
-### In client folder
+### 3. Install dependencies
 
 ```bash
-    npm run start
+# Install client dependencies
+cd client && npm install
+
+# Install server dependencies
+cd ../server && npm install
 ```
 
-It will automatically redirect React localhost at port 3000 server to the default browser.
-Otherwise plesase type:
-**http://localhost:3000** in the browser
-
-<hr>
-
-### NODE.JS SERVER
-
-<hr>
-<hr>
-
-### In server folder
+### 4. Run locally
 
 ```bash
-    npm run dev
+# Terminal 1 — start the backend
+cd server && npm run dev
+
+# Terminal 2 — start the frontend
+cd client && npm start
 ```
 
-When Node.js server is launched you will receive screen like this below in the console. It means that data base services are ready to work on back-end site
-Node.js server is default set at the port 4000.
+App is available at `http://localhost:3000`
 
-```bash
-    > server@1.0.0 dev
-    > nodemon app.js
+---
 
-[nodemon] 2.0.20
-[nodemon] to restart at any time, enter `rs`
-[nodemon] watching path(s): *.*
-[nodemon] watching extensions: js,mjs,json
-[nodemon] starting `node app.js`
-link here: http://localhost:4000
-Connected
+## ☁️ Deployment
+
+### Backend → Railway
+
+1. Create a new project at [railway.app](https://railway.app)
+2. Connect your GitHub repo and select the `/server` folder
+3. Add all environment variables from `server/.env` in the Railway dashboard
+4. Railway will auto-deploy on every push
+
+### Frontend → Vercel
+
+1. Import your repository at [vercel.com](https://vercel.com)
+2. Set **Root Directory** to `client`
+3. Add `REACT_APP_API_URL` = your Railway backend URL (e.g. `https://musicflew.up.railway.app/`)
+4. Deploy
+
+---
+
+## 🔒 Environment Variables
+
+### Client (`client/.env`)
+
+| Variable            | Description                 |
+| ------------------- | --------------------------- |
+| `REACT_APP_API_URL` | URL of the deployed backend |
+
+### Server (`server/.env`)
+
+| Variable                   | Description                     |
+| -------------------------- | ------------------------------- |
+| `DB_STRING`                | MongoDB Atlas connection string |
+| `CORS_ORIGIN`              | Frontend URL (for CORS)         |
+| `FIREBASE_PROJECT_ID`      | Firebase project ID             |
+| `FIREBASE_PRIVATE_KEY`     | Firebase Admin private key      |
+| `FIREBASE_CLIENT_EMAIL`    | Firebase Admin client email     |
+| `FIREBASE_PRIVATE_KEY_ID`  | Firebase private key ID         |
+| `FIREBASE_CLIENT_ID`       | Firebase client ID              |
+| `FIREBASE_CLIENT_CERT_URL` | Firebase cert URL               |
+
+---
+
+## 📁 Project Structure
+
+```
+musicflew/
+├── client/                   # React frontend
+│   ├── src/
+│   │   ├── api/              # Axios API calls
+│   │   ├── components/       # React components
+│   │   ├── config/           # Firebase client config
+│   │   ├── context/          # Global state (useReducer)
+│   │   └── utils/            # Helper functions
+│   └── vercel.json           # Vercel SPA routing config
+└── server/                   # Express backend
+    ├── config/               # Firebase Admin config
+    ├── models/               # Mongoose schemas (User, Song, Artist, Album)
+    ├── routes/               # REST API routes
+    └── railway.toml          # Railway deployment config
 ```
 
-<hr>
+---
 
-###
+## 👤 Author
 
-**All functionality of the Musicflew is now under http://localhost:3000**
-
-### ENJOY !!
+**Tomasz Szopa**  
+📧 [shopa.tomek@gmail.com](mailto:shopa.tomek@gmail.com)  
+🔗 [GitLab Projects](https://gitlab.com/shopa.tomek)
