@@ -2,7 +2,7 @@
 
 A full-stack music streaming web application built with React, Node.js, MongoDB, and Firebase Authentication.
 
-> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) · **Backend:** [Railway](https://railway.app)
+> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) · **Backend:** [Render](https://musicflew.onrender.com)
 
 ---
 
@@ -28,7 +28,7 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 | Database | MongoDB Atlas (Mongoose)                               |
 | Auth     | Firebase Authentication (Google Sign-In)               |
 | Storage  | Firebase Storage                                       |
-| Hosting  | Vercel (frontend) + Railway (backend)                  |
+| Hosting  | Vercel (frontend) + Render (backend)                   |
 
 ---
 
