@@ -1,21 +1,20 @@
 # 🎵 Musicflew
 
-A full-stack music streaming web application built with React, Node.js, MongoDB, and Firebase Authentication.
+A full-stack music streaming web application built with React, Node.js, MongoDB, and Firebase.
 
-> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) · **Backend:** [Render](https://musicflew.onrender.com)
+> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) &nbsp;·&nbsp; **Source:** [github.com/shopatomek/musicflew](https://github.com/shopatomek/musicflew)
 
 ---
 
 ## ✨ Features
 
 - **Google Sign-In** via Firebase Authentication
-- **Role-based access control** — Member / Admin roles
-- **Admin dashboard** — manage songs, artists, albums, and users
-- **Music player** — play songs with full controls (react-h5-audio-player)
-- **File uploads** — audio and images stored in Firebase Storage
+- **Role-based access control** — Member / Admin roles with admin dashboard
+- **Music player** — full playback controls, progress bar, volume
+- **File uploads** — audio and cover images stored in Firebase Storage
 - **CRUD operations** — create, edit, delete songs / artists / albums
 - **Filtering** — filter songs by language, artist, album, category
-- **Animated UI** — smooth transitions with Framer Motion
+- **Animated UI** — smooth page transitions with Framer Motion
 
 ---
 
@@ -25,7 +24,7 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 | -------- | ------------------------------------------------------ |
 | Frontend | React 18, React Router v6, Tailwind CSS, Framer Motion |
 | Backend  | Node.js, Express                                       |
-| Database | MongoDB Atlas (Mongoose)                               |
+| Database | MongoDB Atlas (Mongoose ODM)                           |
 | Auth     | Firebase Authentication (Google Sign-In)               |
 | Storage  | Firebase Storage                                       |
 | Hosting  | Vercel (frontend) + Render (backend)                   |
@@ -35,86 +34,74 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐        ┌────────────────────┐        ┌──────────────┐
-│  React (Vercel) │◄──────►│ Express (Railway)  │◄──────►│ MongoDB Atlas│
-│                 │        │   REST API         │        └──────────────┘
-│  Firebase Auth  │        │   /api/users       │
-│  Firebase Store │        │   /api/songs       │
-└─────────────────┘        │   /api/artist      │
-                           │   /api/albums      │
-                           └────────────────────┘
+flowchart LR
+
+    subgraph Frontend["Frontend"]
+        R[React App]
+        FA[Firebase Auth]
+        FS[Firebase Storage]
+
+        R --> FA
+        R --> FS
+    end
+
+    subgraph Backend["Backend"]
+        E[Express Server]
+        U[/api/users/]
+        S[/api/songs/]
+        AR[/api/artist/]
+        AL[/api/albums/]
+
+        E --> U
+        E --> S
+        E --> AR
+        E --> AL
+    end
+
+    subgraph Database["Database"]
+        M[(MongoDB Atlas)]
+    end
+
+    Frontend <-->|HTTP API| Backend
+    Backend <-->|MongoDB Driver| Database
+**Auth flow:** User signs in with Google → Firebase issues JWT token → React sends token as `Authorization: Bearer` header → Express verifies token via Firebase Admin SDK → user data stored/updated in MongoDB.
 ```
 
-**Auth flow:** User signs in with Google → Firebase issues JWT token → Frontend sends token as `Authorization: Bearer` header → Backend verifies token via Firebase Admin SDK → MongoDB stores user data.
-
----
-
-## 🚀 Getting Started
+## 🚀 Local Development
 
 ### Prerequisites
 
 - Node.js 16+
 - MongoDB Atlas account
-- Firebase project (Auth + Storage enabled)
+- Firebase project (Authentication + Storage enabled)
 
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
-git clone https://github.com/your-username/musicflew.git
+git clone https://github.com/shopatomek/musicflew.git
 cd musicflew
 ```
 
-### 2. Configure environment variables
+### 2. Environment variables
 
 ```bash
-# Client
 cp .env.example client/.env
-
-# Server
 cp .env.example server/.env
 ```
 
-Edit both `.env` files with your credentials (see `.env.example` for all required keys).
+Fill in your credentials — see `.env.example` for all required keys.
 
-### 3. Install dependencies
-
-```bash
-# Install client dependencies
-cd client && npm install
-
-# Install server dependencies
-cd ../server && npm install
-```
-
-### 4. Run locally
+### 3. Install & run
 
 ```bash
-# Terminal 1 — start the backend
-cd server && npm run dev
+# Terminal 1 — backend
+cd server && npm install && npm run dev
 
-# Terminal 2 — start the frontend
-cd client && npm start
+# Terminal 2 — frontend
+cd client && npm install && npm start
 ```
 
-App is available at `http://localhost:3000`
-
----
-
-## ☁️ Deployment
-
-### Backend → Railway
-
-1. Create a new project at [railway.app](https://railway.app)
-2. Connect your GitHub repo and select the `/server` folder
-3. Add all environment variables from `server/.env` in the Railway dashboard
-4. Railway will auto-deploy on every push
-
-### Frontend → Vercel
-
-1. Import your repository at [vercel.com](https://vercel.com)
-2. Set **Root Directory** to `client`
-3. Add `REACT_APP_API_URL` = your Railway backend URL (e.g. `https://musicflew.up.railway.app/`)
-4. Deploy
+App available at `http://localhost:3000`
 
 ---
 
@@ -122,19 +109,25 @@ App is available at `http://localhost:3000`
 
 ### Client (`client/.env`)
 
-| Variable            | Description                 |
-| ------------------- | --------------------------- |
-| `REACT_APP_API_URL` | URL of the deployed backend |
+| Variable                            | Description                                 |
+| ----------------------------------- | ------------------------------------------- |
+| `REACT_APP_API_URL`                 | Backend URL (e.g. `http://localhost:4000/`) |
+| `REACT_APP_FIREBASE_API_KEY`        | Firebase web API key                        |
+| `REACT_APP_FIREBASE_AUTH_DOMAIN`    | Firebase auth domain                        |
+| `REACT_APP_FIREBASE_PROJECT_ID`     | Firebase project ID                         |
+| `REACT_APP_FIREBASE_STORAGE_BUCKET` | Firebase storage bucket                     |
+| `REACT_APP_FIREBASE_MESSAGING_ID`   | Firebase messaging sender ID                |
+| `REACT_APP_FIREBASE_APP_ID`         | Firebase app ID                             |
 
 ### Server (`server/.env`)
 
 | Variable                   | Description                     |
 | -------------------------- | ------------------------------- |
 | `DB_STRING`                | MongoDB Atlas connection string |
-| `CORS_ORIGIN`              | Frontend URL (for CORS)         |
+| `CORS_ORIGIN`              | Frontend URL for CORS           |
 | `FIREBASE_PROJECT_ID`      | Firebase project ID             |
-| `FIREBASE_PRIVATE_KEY`     | Firebase Admin private key      |
-| `FIREBASE_CLIENT_EMAIL`    | Firebase Admin client email     |
+| `FIREBASE_PRIVATE_KEY`     | Firebase Admin SDK private key  |
+| `FIREBASE_CLIENT_EMAIL`    | Firebase Admin SDK client email |
 | `FIREBASE_PRIVATE_KEY_ID`  | Firebase private key ID         |
 | `FIREBASE_CLIENT_ID`       | Firebase client ID              |
 | `FIREBASE_CLIENT_CERT_URL` | Firebase cert URL               |
@@ -154,16 +147,15 @@ musicflew/
 │   │   └── utils/            # Helper functions
 │   └── vercel.json           # Vercel SPA routing config
 └── server/                   # Express backend
-    ├── config/               # Firebase Admin config
-    ├── models/               # Mongoose schemas (User, Song, Artist, Album)
-    ├── routes/               # REST API routes
-    └── railway.toml          # Railway deployment config
+    ├── config/               # Firebase Admin SDK config
+    ├── models/               # Mongoose schemas
+    └── routes/               # REST API routes
 ```
 
 ---
 
 ## 👤 Author
 
-**Tomasz Szopa**  
-📧 [shopa.tomek@gmail.com](mailto:shopa.tomek@gmail.com)  
-🔗 [GitLab Projects](https://gitlab.com/shopa.tomek)
+**Tomasz Szopa**
+&nbsp;·&nbsp; [shopa.tomek@gmail.com](mailto:shopa.tomek@gmail.com)
+&nbsp;·&nbsp; [GitHub](https://github.com/shopatomek)
