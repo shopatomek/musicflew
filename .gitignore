@@ -1,0 +1,28 @@
+# === CRITICAL: SECRETS — NEVER COMMIT THESE ===
+server/config/serviceAccountKey.json
+**/.env
+**/.env.local
+**/.env.production
+
+
+# === Dependencies ===
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# === Build outputs ===
+client/build/
+server/public/static/
+
+# === Logs ===
+*.log
+npm-debug.log*
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === IDE ===
+.vscode/
+.idea/
+

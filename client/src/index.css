@@ -1,0 +1,81 @@
+@import url("https://fonts.cdnfonts.com/css/gotham-rounded");
+@import url("https://fonts.cdnfonts.com/css/axios-pro");
+@import url("https://fonts.cdnfonts.com/css/garant-pro");
+@import url("https://fonts.cdnfonts.com/css/futura-std-4");
+
+* {
+  font-family: "Futura Std", sans-serif;
+  margin: 0;
+  background-color: "black";
+}
+body {
+  background: "black";
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 20px;
+}
+code {
+  font-size: 20px;
+  background: "black";
+}
+.rhap_container {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.rhap_play-pause-button {
+  color: rgb(252, 11, 160) !important;
+  transition: all 0.5s ease-in-out;
+  border-radius: 0px;
+}
+
+.rhap_play-pause-button:hover {
+  transform: scale(1.5);
+}
+
+.rhap_forward-button,
+.rhap_rewind-button,
+.rhap_skip-button,
+.rhap_volume-button,
+.rhap_repeat-button {
+  transition: all 0.3s ease-in-out;
+  color: rgb(152, 152, 152) !important;
+}
+
+.rhap_forward-button:hover,
+.rhap_rewind-button:hover,
+.rhap_skip-button:hover,
+.rhap_volume-button:hover,
+.rhap_repeat-button:hover {
+  transform: scale(1.2);
+  color: rgb(61, 61, 61) !important;
+}
+
+.rhap_progress-filled {
+  background-color: rgb(192, 190, 190) !important;
+}
+
+.rhap_progress-indicator,
+.rhap_volume-indicator {
+  background: rgb(252, 11, 160) !important;
+}
+
+.rhap_progress-indicator:hover,
+.rhap_volume-indicator:hover {
+  transform: scale(1.2);
+}
+.rhap_current-time {
+  color: rgb(192, 190, 190) !important;
+}
+.rhap_total-time {
+  color: rgb(192, 190, 190) !important;
+}
+.rhap_download-progress,
+.rhap_volume-bar {
+  background-color: rgb(61, 61, 61) !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
