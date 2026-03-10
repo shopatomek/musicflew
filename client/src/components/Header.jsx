@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Logo } from "../assets/img";
+import Logo from "../assets/img/logo.png";
 import { isActiveStyles, isNotActiveStyles } from "../utils/styles";
 import { FaCrow } from "react-icons/fa";
 import { useStateValue } from "../context/StateProvider";
@@ -69,7 +69,7 @@ const Header = () => {
         <img
           src={user?.user?.imageURL}
           className="w-12 min-w-[44px] object-cover rounded-full ml-2 shadow-lg"
-          alt=""
+          alt="Logo"
           referrerPolicy="no-referrer"
         />
         <div className="flex flex-col">

@@ -90,17 +90,21 @@ const DashboardHome = () => {
 
   return (
     <>
+      <div className="w-full items-center gap-10 justify-evenly rounded-md  bg-gray-900 hover:bg-gray-800 flex flex-wrap py-2 text-white">
+        <p>Welcome ! </p>
+        <p className="text-white font-semibold"> {user?.user?.name}</p>
+        <div className="w-120 p-4 items-center gap-22 justify-evenly flex flex-wrap py-2 text-white">
+          <FaSignOutAlt></FaSignOutAlt>
+          <img
+            src={user?.user?.imageURL}
+            className="w-10 min-w-[44px] object-cover hover:border rounded-full m-3 shadow-lg cursor-pointer "
+            alt="Logo"
+            referrerPolicy="no-referrer"
+            onClick={SignMeOut}
+          />
+        </div>
+      </div>
       <div className="w-full p-8 my-5 items-center justify-evenly flex flex-wrap">
-        <DashboardCard
-          icon={<FaUsers className="text-xl text-blue-800" />}
-          name={
-            <button>
-              <Link to="/user">Users</Link>
-            </button>
-          }
-          count={filtereUsers ? filtereUsers?.length : allUsers?.length}
-        />
-
         <DashboardCard
           icon={<GiLoveSong className="text-xl text-red-700" />}
           name={
@@ -110,7 +114,6 @@ const DashboardHome = () => {
           }
           count={allSongs?.length > 0 ? allSongs?.length : 0}
         />
-
         <DashboardCard
           icon={<RiUserStarFill className="text-xl text-green-700" />}
           name={
@@ -120,7 +123,6 @@ const DashboardHome = () => {
           }
           count={allArtists?.length > 0 ? allArtists?.length : 0}
         />
-
         <DashboardCard
           icon={<GiMusicalNotes className="text-xl text-red-700" />}
           name={
@@ -130,33 +132,18 @@ const DashboardHome = () => {
           }
           count={allAlbums?.length > 0 ? allAlbums?.length : 0}
         />
+        <DashboardCard
+          icon={<FaUsers className="text-xl text-blue-800" />}
+          name={
+            <button>
+              <Link to="/user">Users</Link>
+            </button>
+          }
+          count={filtereUsers ? filtereUsers?.length : allUsers?.length}
+        />
       </div>
 
       <>
-        <div className="w-full p-4 items-center gap-22 justify-evenly rounded-md  bg-gray-900 hover:bg-gray-800 flex flex-wrap py-2 text-white">
-          <p>Hello there ! </p>
-          <p className="text-white font-semibold"> {user?.user?.name}</p>
-          <div className="w-120 p-4 items-center gap-22 justify-evenly flex flex-wrap py-2 text-white">
-            <FaSignOutAlt></FaSignOutAlt>
-            <img
-              src={user?.user?.imageURL}
-              className="w-10 min-w-[44px] object-cover hover:border rounded-full m-3 shadow-lg cursor-pointer "
-              alt=""
-              referrerPolicy="no-referrer"
-              onClick={SignMeOut}
-            />
-          </div>
-        </div>
-
-        <div className="text-base w-full ml-14 m-3 p-4 gap-10 flex ">
-          <p className="flex">
-            {" "}
-            Songs:
-            <p className="text-orange-500 ml-1 font-semibold">
-              {allSongs?.length > 0 ? allSongs?.length : 0}
-            </p>
-          </p>
-        </div>
         <SongContainer data={allSongs ? allSongs : song} />
       </>
     </>
@@ -166,12 +153,6 @@ const DashboardHome = () => {
 export const SongContainer = ({ data, i }) => {
   return (
     <div className="flex w-full">
-      <div className="flex flex-col w-600 cursor-pointer p-1 float-left">
-        {data &&
-          data.map((song, i) => (
-            <SongList key={song._id} data={song} index={i} type="song" />
-          ))}
-      </div>
       <div className="w-full flex flex-wrap gap-3 items-center justify-evenly">
         {data &&
           data.map((song, i) => (

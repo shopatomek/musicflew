@@ -19,7 +19,7 @@ function Contact() {
 
         <a
           className="w-250 flex gap-2 text-base max-w-[350px] font-semibold hover:text-orange-500 h-250 justify-center mt-2"
-          href="http://gitlab.com/shopa.tomek"
+          href="http://github.com/shopa.tomek"
         >
           My projects
         </a>

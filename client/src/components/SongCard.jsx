@@ -11,6 +11,7 @@ import {
 } from "../api";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
+import Logo from "../assets/img/logo.png";
 
 const SongCard = ({ data, index, type }) => {
   const [isDelete, setisDelete] = useState(false);
@@ -93,7 +94,7 @@ const SongCard = ({ data, index, type }) => {
       <div className="w-40 min-w-[180px] h-40 min-h-[180px] rounded-lg drop-shadow-lg relative overflow-hidden">
         <motion.img
           whileHover={{ scale: 1.05 }}
-          src={data.imageURL}
+          src={data.imageURL || Logo}
           className="w-full h-full rounded-lg object-cover"
         />
       </div>

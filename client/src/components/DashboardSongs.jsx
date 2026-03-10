@@ -57,7 +57,7 @@ const DashboardSongs = () => {
         (data) =>
           data.artist.toLowerCase().includes(songFilter) ||
           data.language.toLowerCase().includes(songFilter) ||
-          data.name.toLowerCase().includes(songFilter)
+          data.name.toLowerCase().includes(songFilter),
       );
       setFilteredSongs(filtered);
     } else {
@@ -84,23 +84,11 @@ const DashboardSongs = () => {
       <div className="w-full flex justify-center items-center gap-20">
         <NavLink
           to={"/newSongs"}
-          className="flex items-center justify-center px-4 py-3 rounded-md hover bg-slate-800 hover:bg-gray-700 cursor-pointer"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white text-black text-xl font-semibold hover:scale-105 active:scale-95 transition-transform"
         >
-          <IoAdd className="text-white font-bold text-2xl" onDrag={showInfo} />
+          <IoAdd className="text-black font-bold text-2xl" onDrag={showInfo} />
+          New Song
         </NavLink>
-
-        <input
-          type="text"
-          className="w-52 px-4 py-2 border 
-          border-gray-700 shadow-xl
-         rounded-md bg-transparent outline-none hover:border-gray-500 
-          duration-150 transition-all ease-in-out text-base text-white font-semibold"
-          placeholder="Search..."
-          value={songFilter}
-          onChange={(e) => setSongFilter(e.target.value)}
-          onBlur={() => setIsFocus(false)}
-          onFocus={() => setIsFocus(true)}
-        />
 
         {songFilter && (
           <motion.i
