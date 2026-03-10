@@ -8,8 +8,7 @@ import { actionType } from "../context/reducer";
 function FilterButtons({ filterData, flag }) {
   const [filterName, setFilterName] = useState(null);
   const [filterMenu, setFilterMenu] = useState(false);
-  const [dispatch] =
-    useStateValue();
+  const [{}, dispatch] = useStateValue();
 
   const updateFilterButton = (name) => {
     setFilterMenu(false);

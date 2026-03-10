@@ -11,17 +11,10 @@ import {
 } from "../api";
 import { useStateValue } from "../context/StateProvider";
 import { actionType } from "../context/reducer";
-import { storage } from "../config/firebase.config";
-import { deleteObject, ref } from "firebase/storage";
 
 const SongCard = ({ data, index, type }) => {
-  //
   const [isDelete, setisDelete] = useState(false);
-  const [
-    { songIndex, isSongPlaying },
-    dispatch,
-  ] = useStateValue();
-  //
+  const [{ songIndex, isSongPlaying }, dispatch] = useStateValue();
 
   const deleteData = (data) => {
     const deletedThisData = () => {
@@ -37,13 +30,7 @@ const SongCard = ({ data, index, type }) => {
       }, 4000);
     };
 
-    //
-
-    const deleteRef = ref(storage, data.imageURL);
-    deleteObject(deleteRef).then(() => {});
-
     // DELETE ALBUM
-
     deleteAlbumById(data._id).then((res) => {
       if (res.data) {
         getAllAlbums().then((data) => {
@@ -57,7 +44,6 @@ const SongCard = ({ data, index, type }) => {
     });
 
     // DELETE ARTIST
-
     deleteArtistById(data._id).then((res) => {
       if (res.data) {
         getAllArtists().then((data) => {
@@ -71,7 +57,6 @@ const SongCard = ({ data, index, type }) => {
     });
 
     // DELETE SONG
-
     deleteSongById(data._id).then((res) => {
       if (res.data) {
         getAllSongs().then((data) => {
@@ -106,7 +91,6 @@ const SongCard = ({ data, index, type }) => {
       onClick={type === "song" && addContext}
     >
       <div className="w-40 min-w-[180px] h-40 min-h-[180px] rounded-lg drop-shadow-lg relative overflow-hidden">
-        {/* images which are fetched to the song card from firebase */}
         <motion.img
           whileHover={{ scale: 1.05 }}
           src={data.imageURL}
@@ -141,7 +125,6 @@ const SongCard = ({ data, index, type }) => {
             Are you sure do you want to delete this song ?
           </p>
           <div className="flex items-center gap-4 py-4">
-            {/* YES BUTTON */}
             <motion.button
               whileTap={{ scale: 0.75 }}
               className=" float-left outline-none border-none text-sm px-6 py-1 rounded-md
@@ -151,7 +134,6 @@ const SongCard = ({ data, index, type }) => {
               Yes
             </motion.button>
 
-            {/* NO BUTTON */}
             <motion.button
               onClick={() => setisDelete(false)}
               whileTap={{ scale: 0.75 }}

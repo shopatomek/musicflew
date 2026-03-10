@@ -1,36 +1,36 @@
-import React, { useEffect } from 'react';
-import { FcGoogle } from 'react-icons/fc';
-import { getAuth, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { app } from '../config/firebase.config';
-import { useNavigate } from 'react-router-dom';
-import { useStateValue } from '../context/StateProvider';
-import { actionType } from '../context/reducer';
-import { validateUser } from '../api';
-import { LoginBg } from '../assets/video';
+import React, { useEffect } from "react";
+import { FcGoogle } from "react-icons/fc";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { app } from "../config/firebase.config";
+import { useNavigate } from "react-router-dom";
+import { useStateValue } from "../context/StateProvider";
+import { actionType } from "../context/reducer";
+import { validateUser } from "../api";
+import { LoginBg } from "../assets/video";
 
- const Login = ({ setAuth }) => {
+const Login = ({ setAuth }) => {
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
   let navigate = useNavigate();
-  
-  const[{user}, dispatch] = useStateValue();
+
+  const [{ user }, dispatch] = useStateValue();
 
   const loginWithGoogle = async () => {
-    await signInWithPopup(firebaseAuth, provider).then((userCred)=>{
-      if(userCred){
+    await signInWithPopup(firebaseAuth, provider).then((userCred) => {
+      if (userCred) {
         setAuth(true);
         window.localStorage.setItem("auth", "true");
 
-        firebaseAuth.onAuthStateChanged((userCred)=> {
-          if(userCred){
+        firebaseAuth.onAuthStateChanged((userCred) => {
+          if (userCred) {
             userCred.getIdToken().then((token) => {
               window.localStorage.setItem("auth", "true");
-              validateUser(token).then((data)=>{
+              validateUser(token).then((data) => {
                 dispatch({
                   type: actionType.SET_USER,
-                  user: data
-                })
-              })
+                  user: data,
+                });
+              });
             });
             navigate("/", { replace: true });
           } else {
@@ -41,12 +41,10 @@ import { LoginBg } from '../assets/video';
             });
             navigate("/login");
           }
-          
-        })  
+        });
       }
-    })
-  }
-
+    });
+  };
 
   useEffect(() => {
     if (window.localStorage.getItem("auth") === "true")
@@ -54,26 +52,26 @@ import { LoginBg } from '../assets/video';
   }, []);
 
   return (
-    <div className='relative w-screen h-screen'> 
-      <video src={LoginBg} 
-      type = "video/mp4"
-      autoPlay
-      muted
-      loop 
-      className='w-full h-full object-cover'
+    <div className="relative w-screen h-screen">
+      <video
+        src={LoginBg}
+        type="video/mp4"
+        autoPlay
+        muted
+        loop
+        className="w-full h-full object-cover"
       />
-      <div className='absolute inset-0 bg-darkOverlay flex items-center justify-center p-4'>
-        <div className='w-full md:w-375 p-4 bg-lightOverlay shadow-2xl rounded-md backdrop-blur-md flex flex-col items-center justify-center'>
-          <div className='flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-cardOverlay cursor-pointer hover:bg-card hover: shadow-md duration-100'
-          onClick= {loginWithGoogle}>
-          <FcGoogle className='text-xl'/>
-          Sign in with Google
-          </div>
-
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+          className="flex items-center justify-center gap-3 px-6 py-2.5 rounded-full border border-white/20 bg-white/10 text-white backdrop-blur-md cursor-pointer hover:bg-white/20 hover:border-white/40 transition-all duration-300 ease-in-out shadow-lg"
+          onClick={loginWithGoogle}
+        >
+          <FcGoogle className="text-2xl" />
+          <span className="font-medium tracking-wide">Sign in with Google</span>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

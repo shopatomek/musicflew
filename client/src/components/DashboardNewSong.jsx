@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  ref,
-  getDownloadURL,
-  uploadBytesResumable,
-  deleteObject,
-} from "firebase/storage";
 import { motion } from "framer-motion";
 import { BiCloudUpload } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-import { storage } from "../config/firebase.config";
 import { useStateValue } from "../context/StateProvider";
 import {
   getAllAlbums,
@@ -23,16 +16,11 @@ import { filterByLanguage, filters } from "../utils/supportfunctions";
 import FilterButtons from "./FilterButtons";
 import ProgressBar from "@ramonak/react-progress-bar";
 
-// import AlertSuccess from "./AlertSuccess";
-// import AlertError from "./AlertError";
-
 function DashboardNewSong() {
-  // States for the uploaded image files
   const [songName, setsongName] = useState("");
   const [songImageCover, setsongImageCover] = useState(null);
   const [imageUploadProgress, setimageUploadProgress] = useState(0);
   const [isImageloading, setisImageloading] = useState(false);
-  // States for the audio files
   const [audioImageCover, setaudioImageCover] = useState(null);
   const [audioUploadingProgress, setaudioUploadingProgress] = useState(0);
   const [isAudioLoading, setisAudioLoading] = useState(false);
@@ -82,8 +70,6 @@ function DashboardNewSong() {
     }
   }, []);
 
-  // orange pop-up when accessing the component
-
   useEffect(() => {
     if ((!songName, !songImageCover, !audioImageCover & setsongName(null))) {
       dispatch({
@@ -123,81 +109,35 @@ function DashboardNewSong() {
     }, 4000);
   };
 
-  // const successPopup = () => {
-  //   dispatch({
-  //     type: actionType.SET_ALERT_TYPE,
-  //     alertType: "success",
-  //   });
-  //   setInterval(() => {
-  //     dispatch({
-  //       type: actionType.SET_ALERT_TYPE,
-  //       alertType: null,
-  //     });
-  //   }, 4000);
-  // };
-
-  // Delete Song Image
+  // Delete handlers — Cloudinary files are deleted via public_id on the server
+  // For now we just clear the local state (URL stored in MongoDB will be cleaned up on song delete)
 
   const deleteSongImage = (url, isImage) => {
-    if (isImage) {
-      setisImageloading(true);
-      // POP-UP ALLERT
-    }
-    const deleteRef = ref(storage, url);
-    deleteObject(deleteRef).then(() => {
-      deletedPopup();
-      setsongImageCover(null);
-      setisImageloading(false);
-    });
+    if (isImage) setisImageloading(true);
+    deletedPopup();
+    setsongImageCover(null);
+    setisImageloading(false);
   };
-
-  // Delete Audio File
 
   const deleteAudioFile = (url, isAudio) => {
-    if (isAudio) {
-      setisAudioLoading(true);
-      // POP-UP ALLERT
-    }
-    const deleteRef = ref(storage, url);
-    deleteObject(deleteRef).then(() => {
-      // POP-UP ALLERT
-      deletedPopup();
-      setaudioImageCover(null);
-      setisAudioLoading(false);
-    });
+    if (isAudio) setisAudioLoading(true);
+    deletedPopup();
+    setaudioImageCover(null);
+    setisAudioLoading(false);
   };
-
-  // Delete Artist Image
 
   const deleteArtistImage = (url, isImage) => {
-    if (isImage) {
-      setisArtistUploading(true);
-      // POP-UP ALLERT
-    }
-
-    const deleteRef = ref(storage, url);
-    deleteObject(deleteRef).then(() => {
-      // POP-UP ALLERT
-      deletedPopup();
-      setartistImageCover(null);
-      setisArtistUploading(false);
-    });
+    if (isImage) setisArtistUploading(true);
+    deletedPopup();
+    setartistImageCover(null);
+    setisArtistUploading(false);
   };
 
-  // Delete Album Image
-
   const deleteAlbumImage = (url, isImage) => {
-    if (isImage) {
-      setIsAlbumUploading(true);
-    }
-
-    const deleteRef = ref(storage, url);
-    deleteObject(deleteRef).then(() => {
-      // POP-UP ALLERT
-      deletedPopup();
-      setalbumImageCover(null);
-      setIsAlbumUploading(false);
-    });
+    if (isImage) setIsAlbumUploading(true);
+    deletedPopup();
+    setalbumImageCover(null);
+    setIsAlbumUploading(false);
   };
 
   // Save Song
@@ -212,12 +152,10 @@ function DashboardNewSong() {
         ? !songName
         : !songName
     ) {
-      // POP-UP ALLERT
       dispatch({
         type: actionType.SET_ALERT_TYPE,
         alertType: "danger",
       });
-
       setInterval(() => {
         dispatch({
           type: actionType.SET_ALERT_TYPE,
@@ -247,7 +185,6 @@ function DashboardNewSong() {
         });
       });
 
-      // POP-UP ALLERT IF SUCCESS
       dispatch({
         type: actionType.SET_ALERT_TYPE,
         alertType: "success",
@@ -264,22 +201,10 @@ function DashboardNewSong() {
       setisImageloading(false);
       setsongImageCover(null);
       setaudioImageCover(null);
-      dispatch({
-        type: actionType.SET_ARTIST_FILTER,
-        artistFilter: null,
-      });
-      dispatch({
-        type: actionType.SET_LANGUAGE_FILTER,
-        languageFilter: null,
-      });
-      dispatch({
-        type: actionType.SET_ALBUM_FILTER,
-        albumFilter: null,
-      });
-      dispatch({
-        type: actionType.SET_FILTER_TERM,
-        filterTerm: null,
-      });
+      dispatch({ type: actionType.SET_ARTIST_FILTER, artistFilter: null });
+      dispatch({ type: actionType.SET_LANGUAGE_FILTER, languageFilter: null });
+      dispatch({ type: actionType.SET_ALBUM_FILTER, albumFilter: null });
+      dispatch({ type: actionType.SET_FILTER_TERM, filterTerm: null });
     }
   };
 
@@ -287,12 +212,10 @@ function DashboardNewSong() {
 
   const saveArtist = () => {
     if (!artistImageCover || !artistName || !twitter || !instagram) {
-      // POP-UP ALLERT IF ANY ERROR OCCURS
       dispatch({
         type: actionType.SET_ALERT_TYPE,
         alertType: "danger",
       });
-
       setInterval(() => {
         dispatch({
           type: actionType.SET_ALERT_TYPE,
@@ -317,15 +240,9 @@ function DashboardNewSong() {
         });
       });
 
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: "success",
-      });
+      dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "success" });
       setInterval(() => {
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: null,
-        });
+        dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null });
       }, 4000);
 
       setisArtistUploading(false);
@@ -335,21 +252,13 @@ function DashboardNewSong() {
     }
   };
 
-  // Save Album function
+  // Save Album
 
   const saveAlbum = () => {
     if (!albumImageCover || !albumName) {
-      // POP-UP ALLERT
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: "danger",
-      });
-
+      dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "danger" });
       setInterval(() => {
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: null,
-        });
+        dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null });
       }, 4000);
     } else {
       setIsAlbumUploading(true);
@@ -366,16 +275,9 @@ function DashboardNewSong() {
         });
       });
 
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: "success",
-      });
-
+      dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "success" });
       setInterval(() => {
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: null,
-        });
+        dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null });
       }, 4000);
 
       setIsAlbumUploading(false);
@@ -393,15 +295,14 @@ function DashboardNewSong() {
         value={songName}
         onChange={(e) => setsongName(e.target.value)}
       />
-      {/* Filter Button component. Filter buttons functions are defined in the FilterButtons.jsx file */}
       <div className="flex w-full justify-between flex-wrap items-center gap-4 border-gray-800">
         <FilterButtons filterData={allArtists} flag={"Artist"} />
         <FilterButtons filterData={allAlbums} flag={"Albums"} />
         <FilterButtons filterData={filterByLanguage} flag={"Language"} />
         <FilterButtons filterData={filters} flag={"Category"} />
       </div>
-      {/* Image file Uploader */}
 
+      {/* Image file Uploader */}
       <div className="bg-black backdrop-blur-sm w-full h-300 rounded-md border-2 border-gray-800 cursor-pointer">
         {isImageloading && <FileLoader progress={imageUploadProgress} />}
         {!isImageloading && (
@@ -434,7 +335,6 @@ function DashboardNewSong() {
       </div>
 
       {/* Audio file uploading */}
-
       <div className="bg-black backdrop-blur-sm w-full h-300 rounded-md border-2 border-gray-800 cursor-pointer">
         {isAudioLoading && <FileLoader progress={audioUploadingProgress} />}
         {!isAudioLoading && (
@@ -465,8 +365,8 @@ function DashboardNewSong() {
           </>
         )}
       </div>
-      {/* Save button  */}
 
+      {/* Save button */}
       <div className="flex items-center justify-center cursor-pointer w-60 p-4">
         {isImageloading || isAudioLoading ? (
           <DisableButton />
@@ -481,8 +381,7 @@ function DashboardNewSong() {
         )}
       </div>
 
-      {/* Image uploader for ARTISTS */}
-
+      {/* Artist Details */}
       <p className="font-semibold text-2xl">Artist Details</p>
 
       <div className="bg-black backdrop-blur-sm w-full h-300 rounded-md border-2 border-gray-800 cursor-pointer">
@@ -516,7 +415,6 @@ function DashboardNewSong() {
         )}
       </div>
 
-      {/* Artist Name */}
       <input
         type="text"
         placeholder="Artist name"
@@ -525,7 +423,6 @@ function DashboardNewSong() {
         onChange={(e) => setArtistName(e.target.value)}
       />
 
-      {/* Twitter */}
       <div className="flex items-center rounded-md p-3 border border-gray-800 w-full">
         <p className="text-base font-semibold text-gray-800">
           www.twitter.com/
@@ -539,7 +436,6 @@ function DashboardNewSong() {
         />
       </div>
 
-      {/* Instagram */}
       <div className="flex items-center rounded-md p-3 border border-gray-800 w-full">
         <p className="text-base font-semibold text-gray-800">
           www.instagram.com/
@@ -552,8 +448,6 @@ function DashboardNewSong() {
           onChange={(e) => setInstagram(e.target.value)}
         />
       </div>
-
-      {/* SAVE BUTTON FOR ARTIST */}
 
       <div className="flex items-center justify-center cursor-pointer w-60 p-4">
         {isArtistUploading ? (
@@ -603,8 +497,6 @@ function DashboardNewSong() {
         )}
       </div>
 
-      {/* ALBUM NAME */}
-
       <input
         type="text"
         placeholder="Album name.."
@@ -612,8 +504,6 @@ function DashboardNewSong() {
         value={albumName}
         onChange={(e) => setAlbumName(e.target.value)}
       />
-
-      {/* SAVE ALBUM BUTTON */}
 
       <div className="flex items-center justify-center cursor-pointer w-60 p-4">
         {isAlbumUploading ? (
@@ -633,7 +523,6 @@ function DashboardNewSong() {
 }
 
 // Blue Loading... button
-
 export const DisableButton = () => {
   return (
     <button
@@ -667,12 +556,9 @@ export const DisableButton = () => {
 };
 
 // File Loader with progress bar
-
 export const FileLoader = ({ progress }) => {
   return (
     <div className="w full h-full flex flex-col items-center justify-center bg-black text white">
-      {/* <p className="text-2xl font-semibold text-textColor border-red"> */}
-
       <ProgressBar
         completed={progress.toFixed(0)}
         maxCompleted={95}
@@ -684,8 +570,6 @@ export const FileLoader = ({ progress }) => {
         bgColor="rgb(29 78 216 )"
         transitionDuration="0.5s"
       />
-      {/* {Math.round(progress) > 0 && <> {`${Math.round(progress)}%`}</>} */}
-      {/* </p> */}
       <div className="w-20 h-20 min-w-[40px] bg-red-800 animate-ping rounded-full flex items-center justify-center relative">
         <div className="absolute inset-0 rounded-full bg-red-800 blur-xl"></div>
       </div>
@@ -693,6 +577,7 @@ export const FileLoader = ({ progress }) => {
   );
 };
 
+// Cloudinary File Uploader
 export const FileUploader = ({
   updateState,
   setProgress,
@@ -700,55 +585,61 @@ export const FileUploader = ({
   isImage,
 }) => {
   const [{}, dispatch] = useStateValue();
-  const uploadFile = (e) => {
+
+  const uploadFile = async (e) => {
     isLoading(true);
     const uploadedFile = e.target.files[0];
-    // console.log(uploadedFile);
-    // isLoading(false);
-    const storageRef = ref(
-      storage,
-      `${isImage ? "images" : "audio"}/${Date.now()}-${uploadedFile.name}`
-    );
-    const uploadTask = uploadBytesResumable(storageRef, uploadedFile);
 
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        setProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-      },
-      (error) => {
-        // IF ANY ERROR OCCURS DISPLAY DANGER
+    const cloudName = process.env.REACT_APP_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET;
+    const resourceType = isImage ? "image" : "video"; // Cloudinary uses "video" for audio
 
-        console.log(error);
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: "danger",
-        });
-        setInterval(() => {
-          dispatch({
-            type: actionType.SET_ALERT_TYPE,
-            alertType: null,
-          });
-        }, 5000);
-      },
-      () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          updateState(downloadURL);
+    const formData = new FormData();
+    formData.append("file", uploadedFile);
+    formData.append("upload_preset", uploadPreset);
+    formData.append("folder", "musicflew");
+
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open(
+        "POST",
+        `https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`,
+      );
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          setProgress((event.loaded / event.total) * 100);
+        }
+      };
+
+      xhr.onload = () => {
+        const response = JSON.parse(xhr.responseText);
+        if (xhr.status === 200) {
+          updateState(response.secure_url);
           isLoading(false);
-        });
-        // IF SUCCESS CREATING DOWNLOAD URL DISPLAY SUCCESS GREEN ALERT
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: "success",
-        });
+          dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "success" });
+          setInterval(() => {
+            dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null });
+          }, 4000);
+        } else {
+          throw new Error(response.error?.message || "Upload failed");
+        }
+      };
+
+      xhr.onerror = () => {
+        isLoading(false);
+        dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "danger" });
         setInterval(() => {
-          dispatch({
-            type: actionType.SET_ALERT_TYPE,
-            alertType: null,
-          });
-        }, 4000);
-      }
-    );
+          dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null });
+        }, 5000);
+      };
+
+      xhr.send(formData);
+    } catch (error) {
+      console.error("Cloudinary upload error:", error);
+      isLoading(false);
+      dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "danger" });
+    }
   };
 
   return (
