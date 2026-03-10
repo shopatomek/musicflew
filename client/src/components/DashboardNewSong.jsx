@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiCloudUpload } from "react-icons/bi";
 import { MdDelete, MdMusicNote, MdPerson, MdAlbum } from "react-icons/md";
+import { IoWarning, IoCheckmarkCircle } from "react-icons/io5";
 import { useStateValue } from "../context/StateProvider";
 import { useLocation } from "react-router-dom";
 import {
@@ -23,9 +24,56 @@ const TABS = [
   { id: "album", label: "Album", icon: MdAlbum },
 ];
 
+// ── Toast component ──────────────────────────────────────────────────────────
+const Toast = ({ toasts }) => (
+  <div className="fixed top-6 right-6 z-50 flex flex-col gap-2 pointer-events-none">
+    <AnimatePresence>
+      {toasts.map((t) => (
+        <motion.div
+          key={t.id}
+          initial={{ opacity: 0, x: 60 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 60 }}
+          transition={{ duration: 0.22 }}
+          className={`flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl border text-sm min-w-[260px] max-w-xs
+            ${
+              t.type === "error"
+                ? "bg-[#1e1010] border-red-500/30 text-red-300"
+                : "bg-[#101e10] border-green-500/30 text-green-300"
+            }`}
+        >
+          {t.type === "error" ? (
+            <IoWarning className="text-red-400 text-lg shrink-0" />
+          ) : (
+            <IoCheckmarkCircle className="text-green-400 text-lg shrink-0" />
+          )}
+          <span>{t.message}</span>
+        </motion.div>
+      ))}
+    </AnimatePresence>
+  </div>
+);
+
+// ── Toast hook ───────────────────────────────────────────────────────────────
+const useToast = () => {
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = (message, type = "error") => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  };
+
+  return { toasts, addToast };
+};
+
+// ── Main component ───────────────────────────────────────────────────────────
 function DashboardNewSong() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState(location.state?.section || "song");
+  const { toasts, addToast } = useToast();
 
   // Song state
   const [songName, setsongName] = useState("");
@@ -77,27 +125,28 @@ function DashboardNewSong() {
     if (location.state?.section) setActiveTab(location.state.section);
   }, [location.state]);
 
-  const showAlert = (type) => {
-    dispatch({ type: actionType.SET_ALERT_TYPE, alertType: type });
-    setTimeout(
-      () => dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null }),
-      4000,
-    );
-  };
-
   // ── Save Song ─────────────────────────────────────────────────────────────
   const saveSong = () => {
-    if (!songName) {
-      showAlert("danger");
+    if (!songName && !audioImageCover) {
+      addToast("Song title and audio file are required.");
       return;
     }
+    if (!songName) {
+      addToast("Please enter a song title.");
+      return;
+    }
+    if (!audioImageCover) {
+      addToast("Please upload an audio file.");
+      return;
+    }
+
     setisAudioLoading(true);
     setisImageloading(true);
 
     saveNewSong({
       name: songName,
       imageURL: songImageCover || "",
-      songURL: audioImageCover || "",
+      songURL: audioImageCover,
       album: albumFilter || "",
       artist: artistFilter || "Unknown",
       language: languageFilter || "Other",
@@ -106,9 +155,9 @@ function DashboardNewSong() {
       getAllSongs().then((s) =>
         dispatch({ type: actionType.SET_ALL_SONGS, allSongs: s.song }),
       );
+      addToast("Song saved successfully!", "success");
     });
 
-    showAlert("success");
     setsongName("");
     setisAudioLoading(false);
     setisImageloading(false);
@@ -123,7 +172,7 @@ function DashboardNewSong() {
   // ── Save Artist ───────────────────────────────────────────────────────────
   const saveArtist = () => {
     if (!artistName) {
-      showAlert("danger");
+      addToast("Please enter an artist name.");
       return;
     }
     setisArtistUploading(true);
@@ -133,10 +182,10 @@ function DashboardNewSong() {
         getAllArtists().then((d) =>
           dispatch({ type: actionType.SET_ALL_ARTISTS, allArtists: d.data }),
         );
+        addToast("Artist saved successfully!", "success");
       },
     );
 
-    showAlert("success");
     setisArtistUploading(false);
     setartistImageCover(null);
     setArtistName("");
@@ -145,7 +194,7 @@ function DashboardNewSong() {
   // ── Save Album ────────────────────────────────────────────────────────────
   const saveAlbum = () => {
     if (!albumName) {
-      showAlert("danger");
+      addToast("Please enter an album name.");
       return;
     }
     setIsAlbumUploading(true);
@@ -155,187 +204,190 @@ function DashboardNewSong() {
         getAllAlbums().then((d) =>
           dispatch({ type: actionType.SET_ALL_ALBUMS, allAlbums: d.album }),
         );
+        addToast("Album saved successfully!", "success");
       },
     );
 
-    showAlert("success");
     setIsAlbumUploading(false);
     setalbumImageCover(null);
     setAlbumName("");
   };
 
   return (
-    <div className="flex w-full bg-black text-white">
-      {/* ── Create form ── */}
-      <div className="flex-1 px-8 py-8 max-w-xl">
-        {/* Tab bar */}
-        <div className="flex items-center gap-1 p-1 bg-[#1a1a1a] rounded-lg w-fit mb-8 border border-white/10">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveTab(id)}
-              className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                activeTab === id
-                  ? "bg-white text-black shadow"
-                  : "text-gray-400 hover:text-white"
-              }`}
-            >
-              <Icon className="text-base" />
-              {label}
-            </button>
-          ))}
-        </div>
+    <>
+      <Toast toasts={toasts} />
 
-        <AnimatePresence mode="wait">
-          {/* ════ SONG ════════════════════════════════════════════════ */}
-          {activeTab === "song" && (
-            <motion.div
-              key="song"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-col gap-5"
-            >
-              <h2 className="text-xl tracking-tight">Add a Song</h2>
+      <div className="flex w-full bg-black text-white">
+        <div className="flex-1 px-8 py-8 max-w-xl">
+          {/* Tab bar */}
+          <div className="flex items-center gap-1 p-1 bg-[#1a1a1a] rounded-lg w-fit mb-8 border border-white/10">
+            {TABS.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id)}
+                className={`flex items-center gap-2 px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  activeTab === id
+                    ? "bg-white text-black shadow"
+                    : "text-gray-400 hover:text-white"
+                }`}
+              >
+                <Icon className="text-base" />
+                {label}
+              </button>
+            ))}
+          </div>
 
-              <input
-                type="text"
-                placeholder="Song title"
-                className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
-                value={songName}
-                onChange={(e) => setsongName(e.target.value)}
-              />
+          <AnimatePresence mode="wait">
+            {/* ════ SONG ══════════════════════════════════════════════ */}
+            {activeTab === "song" && (
+              <motion.div
+                key="song"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col gap-5"
+              >
+                <h2 className="text-xl tracking-tight">Add a Song</h2>
 
-              <div className="grid grid-cols-2 gap-2">
-                <FilterButtons filterData={allArtists} flag={"Artist"} />
-                <FilterButtons filterData={allAlbums} flag={"Albums"} />
-                <FilterButtons
-                  filterData={filterByLanguage}
-                  flag={"Language"}
+                <input
+                  type="text"
+                  placeholder="Song title"
+                  className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
+                  value={songName}
+                  onChange={(e) => setsongName(e.target.value)}
                 />
-                <FilterButtons filterData={filters} flag={"Category"} />
-              </div>
 
-              <UploadField
-                label="Cover image"
-                height="h-36"
-                isLoading={isImageloading}
-                progress={imageUploadProgress}
-                url={songImageCover}
-                onClear={() => setsongImageCover(null)}
-                isImage={true}
-                updateState={setsongImageCover}
-                setProgress={setimageUploadProgress}
-                setIsLoading={setisImageloading}
-              />
+                <div className="grid grid-cols-2 gap-2">
+                  <FilterButtons filterData={allArtists} flag={"Artist"} />
+                  <FilterButtons filterData={allAlbums} flag={"Albums"} />
+                  <FilterButtons
+                    filterData={filterByLanguage}
+                    flag={"Language"}
+                  />
+                  <FilterButtons filterData={filters} flag={"Category"} />
+                </div>
 
-              <UploadField
-                label="Audio file"
-                height="h-24"
-                isLoading={isAudioLoading}
-                progress={audioUploadingProgress}
-                url={audioImageCover}
-                onClear={() => setaudioImageCover(null)}
-                isImage={false}
-                updateState={setaudioImageCover}
-                setProgress={setaudioUploadingProgress}
-                setIsLoading={setisAudioLoading}
-                isAudio={true}
-              />
+                <UploadField
+                  label="Cover image"
+                  height="h-36"
+                  isLoading={isImageloading}
+                  progress={imageUploadProgress}
+                  url={songImageCover}
+                  onClear={() => setsongImageCover(null)}
+                  isImage={true}
+                  updateState={setsongImageCover}
+                  setProgress={setimageUploadProgress}
+                  setIsLoading={setisImageloading}
+                />
 
-              <SaveButton
-                onClick={saveSong}
-                disabled={isImageloading || isAudioLoading}
-                label="Save Song"
-              />
-            </motion.div>
-          )}
+                <UploadField
+                  label="Audio file"
+                  height="h-24"
+                  isLoading={isAudioLoading}
+                  progress={audioUploadingProgress}
+                  url={audioImageCover}
+                  onClear={() => setaudioImageCover(null)}
+                  isImage={false}
+                  updateState={setaudioImageCover}
+                  setProgress={setaudioUploadingProgress}
+                  setIsLoading={setisAudioLoading}
+                  isAudio={true}
+                />
 
-          {/* ════ ARTIST ══════════════════════════════════════════════ */}
-          {activeTab === "artist" && (
-            <motion.div
-              key="artist"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-col gap-5"
-            >
-              <h2 className="text-xl tracking-tight">Add an Artist</h2>
+                <SaveButton
+                  onClick={saveSong}
+                  disabled={isImageloading || isAudioLoading}
+                  label="Save Song"
+                />
+              </motion.div>
+            )}
 
-              <input
-                type="text"
-                placeholder="Artist name"
-                className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
-                value={artistName}
-                onChange={(e) => setArtistName(e.target.value)}
-              />
+            {/* ════ ARTIST ════════════════════════════════════════════ */}
+            {activeTab === "artist" && (
+              <motion.div
+                key="artist"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col gap-5"
+              >
+                <h2 className="text-xl tracking-tight">Add an Artist</h2>
 
-              <UploadField
-                label="Artist photo"
-                height="h-48"
-                isLoading={isArtistUploading}
-                progress={artistUploadingProgress}
-                url={artistImageCover}
-                onClear={() => setartistImageCover(null)}
-                isImage={true}
-                updateState={setartistImageCover}
-                setProgress={setartistUploadingProgress}
-                setIsLoading={setisArtistUploading}
-              />
+                <input
+                  type="text"
+                  placeholder="Artist name"
+                  className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
+                  value={artistName}
+                  onChange={(e) => setArtistName(e.target.value)}
+                />
 
-              <SaveButton
-                onClick={saveArtist}
-                disabled={isArtistUploading}
-                label="Save Artist"
-              />
-            </motion.div>
-          )}
+                <UploadField
+                  label="Artist photo"
+                  height="h-48"
+                  isLoading={isArtistUploading}
+                  progress={artistUploadingProgress}
+                  url={artistImageCover}
+                  onClear={() => setartistImageCover(null)}
+                  isImage={true}
+                  updateState={setartistImageCover}
+                  setProgress={setartistUploadingProgress}
+                  setIsLoading={setisArtistUploading}
+                />
 
-          {/* ════ ALBUM ═══════════════════════════════════════════════ */}
-          {activeTab === "album" && (
-            <motion.div
-              key="album"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.18 }}
-              className="flex flex-col gap-5"
-            >
-              <h2 className="text-xl tracking-tight">Add an Album</h2>
+                <SaveButton
+                  onClick={saveArtist}
+                  disabled={isArtistUploading}
+                  label="Save Artist"
+                />
+              </motion.div>
+            )}
 
-              <input
-                type="text"
-                placeholder="Album name"
-                className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
-                value={albumName}
-                onChange={(e) => setAlbumName(e.target.value)}
-              />
+            {/* ════ ALBUM ═════════════════════════════════════════════ */}
+            {activeTab === "album" && (
+              <motion.div
+                key="album"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col gap-5"
+              >
+                <h2 className="text-xl tracking-tight">Add an Album</h2>
 
-              <UploadField
-                label="Album cover"
-                height="h-48"
-                isLoading={isAlbumUploading}
-                progress={albumUploadingProgress}
-                url={albumImageCover}
-                onClear={() => setalbumImageCover(null)}
-                isImage={true}
-                updateState={setalbumImageCover}
-                setProgress={setAlbumUploadingProgress}
-                setIsLoading={setIsAlbumUploading}
-              />
+                <input
+                  type="text"
+                  placeholder="Album name"
+                  className="w-full px-4 py-3 rounded-lg bg-[#1a1a1a] border border-white/10 text-white placeholder-gray-600 focus:outline-none focus:border-white/30 transition-colors text-sm"
+                  value={albumName}
+                  onChange={(e) => setAlbumName(e.target.value)}
+                />
 
-              <SaveButton
-                onClick={saveAlbum}
-                disabled={isAlbumUploading}
-                label="Save Album"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <UploadField
+                  label="Album cover"
+                  height="h-48"
+                  isLoading={isAlbumUploading}
+                  progress={albumUploadingProgress}
+                  url={albumImageCover}
+                  onClear={() => setalbumImageCover(null)}
+                  isImage={true}
+                  updateState={setalbumImageCover}
+                  setProgress={setAlbumUploadingProgress}
+                  setIsLoading={setIsAlbumUploading}
+                />
+
+                <SaveButton
+                  onClick={saveAlbum}
+                  disabled={isAlbumUploading}
+                  label="Save Album"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -384,7 +436,7 @@ const UploadField = ({
         </div>
       ) : (
         <div className="relative w-full h-full">
-          <img src={url} alt="Logo" className="w-full h-full object-cover" />
+          <img src={url} alt="" className="w-full h-full object-cover" />
           <button
             onClick={onClear}
             className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 hover:bg-red-600 transition-colors"
@@ -466,12 +518,6 @@ export const FileUploader = ({
         if (xhr.status === 200) {
           updateState(response.secure_url);
           isLoading(false);
-          dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "success" });
-          setTimeout(
-            () =>
-              dispatch({ type: actionType.SET_ALERT_TYPE, alertType: null }),
-            4000,
-          );
         } else {
           isLoading(false);
           dispatch({ type: actionType.SET_ALERT_TYPE, alertType: "danger" });

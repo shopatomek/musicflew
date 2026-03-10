@@ -10,88 +10,46 @@ import { motion } from "framer-motion";
 
 const DashboardSongs = () => {
   const [songFilter, setSongFilter] = useState("");
-  const [setIsFocus] = useState(false);
+  const [isFocus, setIsFocus] = useState(false);
   const [filteredSongs, setFilteredSongs] = useState(null);
   const [{ allSongs }, dispatch] = useStateValue();
 
   useEffect(() => {
     if (!allSongs) {
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: null,
-      });
-      setInterval(() => {
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: null,
-        });
-      }, 5000);
-    } else {
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: "clickplus",
-      });
-      setInterval(() => {
-        dispatch({
-          type: actionType.SET_ALERT_TYPE,
-          alertType: null,
-        });
-      }, 7000);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!allSongs) {
       getAllSongs().then((data) => {
-        dispatch({
-          type: actionType.SET_ALL_SONGS,
-          allSongs: data.song,
-        });
+        dispatch({ type: actionType.SET_ALL_SONGS, allSongs: data.song });
       });
     }
   }, []);
 
   useEffect(() => {
-    if (songFilter.length > 0) {
+    if (songFilter.length > 0 && allSongs) {
+      const term = songFilter.toLowerCase();
       const filtered = allSongs.filter(
         (data) =>
-          data.artist.toLowerCase().includes(songFilter) ||
-          data.language.toLowerCase().includes(songFilter) ||
-          data.name.toLowerCase().includes(songFilter),
+          data.artist?.toLowerCase().includes(term) ||
+          data.language?.toLowerCase().includes(term) ||
+          data.name?.toLowerCase().includes(term),
       );
       setFilteredSongs(filtered);
     } else {
-      setFilteredSongs("");
+      setFilteredSongs(null);
     }
-  }, [songFilter]);
-
-  const showInfo = () => {
-    dispatch({
-      type: actionType.SET_ALERT_TYPE,
-      alertType: "deleted",
-    });
-    setInterval(() => {
-      dispatch({
-        type: actionType.SET_ALERT_TYPE,
-        alertType: null,
-      });
-    }, 4000);
-  };
+  }, [songFilter, allSongs]);
 
   return (
-    // SEARCH BAR
     <div className="w-full p-4 flex items-center justify-center flex-col">
-      <div className="w-full flex justify-center items-center gap-20">
+      <div className="w-full flex justify-center items-center gap-6 mb-4">
         <NavLink
           to={"/newSongs"}
-          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white text-black text-xl font-semibold hover:scale-105 active:scale-95 transition-transform"
+          className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white text-black text-sm font-semibold hover:scale-105 active:scale-95 transition-transform"
         >
-          <IoAdd className="text-black font-bold text-2xl" onDrag={showInfo} />
+          <IoAdd className="text-black text-lg" />
           New Song
         </NavLink>
 
         {songFilter && (
-          <motion.i
+          <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             whileTap={{ scale: 0.75 }}
@@ -100,20 +58,18 @@ const DashboardSongs = () => {
               setFilteredSongs(null);
             }}
           >
-            <AiOutlineClear className="text-3xl text-textColor cursor-pointer" />
-          </motion.i>
+            <AiOutlineClear className="text-2xl text-gray-400 cursor-pointer hover:text-white" />
+          </motion.button>
         )}
       </div>
 
-      {/* Main iterface with songs */}
-      <div className="relative w-full my-4 p-4 py-16">
+      <div className="relative w-full my-4 p-4 py-8">
         <div className="absolute top-4 left-4">
-          <p className="text-base text-white">
-            <span className=" text-white">Count :{""}</span>
-            {filteredSongs ? filteredSongs?.length : allSongs?.length}
+          <p className="text-sm text-gray-400">
+            Count:{" "}
+            {filteredSongs ? filteredSongs.length : (allSongs?.length ?? 0)}
           </p>
         </div>
-        {/* Song container */}
         <SongContainer data={filteredSongs ? filteredSongs : allSongs} />
       </div>
     </div>
