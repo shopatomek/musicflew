@@ -7,7 +7,7 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 [![Storage](https://img.shields.io/badge/Storage-Cloudinary-lihgtblue)](/)
 [![Hosting](https://img.shields.io/badge/Hosting-Vercel%20%7C%20Render-black)](/)
 
-> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) &nbsp;·&nbsp; **Source:** [github.com/shopatomek/musicflew](https://github.com/shopatomek/musicflew)
+> **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app)
 
 ---
 
@@ -16,10 +16,6 @@ A full-stack music streaming web application built with React, Node.js, MongoDB,
 </p>
 
 ---
-
-## ✨ Features
-
-... (reszta Twojego opisu)
 
 ## ✨ Features
 
