@@ -2,9 +2,24 @@
 
 A full-stack music streaming web application built with React, Node.js, MongoDB, Firebase Authentication, and Cloudinary.
 
+[![Stack](https://img.shields.io/badge/stack-React%20%7C%20Node.js%20%7C%20MongoDB-blue)](/)
+[![Auth](https://img.shields.io/badge/Auth-Firebase-orange)](/)
+[![Storage](https://img.shields.io/badge/Storage-Cloudinary-lihgtblue)](/)
+[![Hosting](https://img.shields.io/badge/Hosting-Vercel%20%7C%20Render-black)](/)
+
 > **Live demo:** [musicflew.vercel.app](https://musicflew.vercel.app) &nbsp;·&nbsp; **Source:** [github.com/shopatomek/musicflew](https://github.com/shopatomek/musicflew)
 
 ---
+
+<p align="center">
+  <img src="assets/musicflew_asset.gif" alt="Musicflew Preview" width="100%">
+</p>
+
+---
+
+## ✨ Features
+
+... (reszta Twojego opisu)
 
 ## ✨ Features
 
