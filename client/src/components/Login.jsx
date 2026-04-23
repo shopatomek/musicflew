@@ -1,11 +1,6 @@
 import React, { useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
-import {
-  getAuth,
-  GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { app } from "../config/firebase.config";
 import { useNavigate } from "react-router-dom";
 import { useStateValue } from "../context/StateProvider";
@@ -16,60 +11,45 @@ import { LoginBg } from "../assets/video";
 const Login = ({ setAuth }) => {
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
-  const navigate = useNavigate();
+  let navigate = useNavigate();
+
   const [{ user }, dispatch] = useStateValue();
 
-  // Funkcja do obsługi powrotu z przekierowania
-  const processUserData = async (firebaseUser) => {
-    if (firebaseUser) {
-      const token = await firebaseUser.getIdToken();
-      window.localStorage.setItem("auth", "true");
-
-      const data = await validateUser(token);
-      dispatch({
-        type: actionType.SET_USER,
-        user: data,
-      });
-
-      setAuth(true);
-      navigate("/", { replace: true });
-    }
-  };
-
-  // 1. Obsługa powrotu z przekierowania Google
-  useEffect(() => {
-    getRedirectResult(firebaseAuth)
-      .then((result) => {
-        if (result?.user) {
-          processUserData(result.user);
-        }
-      })
-      .catch((error) => {
-        console.error("Błąd podczas logowania (Redirect):", error);
-      });
-  }, []);
-
-  // 2. Jeśli użytkownik jest już zalogowany (odświeżenie strony)
-  useEffect(() => {
-    const isAuth = window.localStorage.getItem("auth");
-    if (isAuth === "true") {
-      // Sprawdzamy czy firebaseAuth już ma użytkownika
-      const unsubscribe = firebaseAuth.onAuthStateChanged((userCred) => {
-        if (userCred) {
-          processUserData(userCred);
-        } else {
-          // Jeśli localStorage mówi true, ale Firebase nie widzi sesji
-          window.localStorage.setItem("auth", "false");
-        }
-        unsubscribe();
-      });
-    }
-  }, []);
-
-  // 3. Wyzwalacz logowania
   const loginWithGoogle = async () => {
-    await signInWithRedirect(firebaseAuth, provider);
+    await signInWithPopup(firebaseAuth, provider).then((userCred) => {
+      if (userCred) {
+        setAuth(true);
+        window.localStorage.setItem("auth", "true");
+
+        firebaseAuth.onAuthStateChanged((userCred) => {
+          if (userCred) {
+            userCred.getIdToken().then((token) => {
+              window.localStorage.setItem("auth", "true");
+              validateUser(token).then((data) => {
+                dispatch({
+                  type: actionType.SET_USER,
+                  user: data,
+                });
+              });
+            });
+            navigate("/", { replace: true });
+          } else {
+            setAuth(false);
+            dispatch({
+              type: actionType.SET_USER,
+              user: null,
+            });
+            navigate("/login");
+          }
+        });
+      }
+    });
   };
+
+  useEffect(() => {
+    if (window.localStorage.getItem("auth") === "true")
+      navigate("/", { replace: true });
+  }, []);
 
   return (
     <div className="relative w-screen h-screen">
